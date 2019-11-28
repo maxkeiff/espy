@@ -1,10 +1,8 @@
-CRC_POLY = int("0b10000000", 2)
-
-
 class CyclicRedundancyCheck:
+    """Base class for CRC algorithms. Derive and hardcode p to define CRC versions."""
+
     def __init__(self, p):
-        """
-        Initializes a CRC that given a bitstream computes its residuo module p.
+        """Initializes a CRC that given a bitstream computes its residuo module p.
 
         Args:
             p (str): string that represents the polynomial. For example x^4+x^2+1 yields to "10101".
@@ -43,9 +41,27 @@ class CyclicRedundancyCheck:
         return bin(crc_register)[2:].zfill(self.n)
 
     def crc_encode(self, a):
+        """Appends n redundancy bits on the message.
+
+        Args:
+            a (str): message 
+
+        Returns:
+            str: message with redundancy bits
+        """
+
         return a + self.compute_crc(a)
 
     def crc_check(self, a):
+        """Takes a message with CRC bits and checks if the message yields to the given CRC.
+
+        Args:
+            a (str): A bitstring with n CRC bits at the end
+
+        Returs:
+            bool: True if valid
+        """
+
         message = a[: -self.n]
         crc = a[-self.n :]
         crc_received = self.compute_crc(message)
