@@ -1,4 +1,5 @@
 import numpy as np
+import functools as ft
 
 
 class BlockCode:
@@ -16,18 +17,22 @@ class BlockCode:
         return self._dimension
 
     @property
+    @ft.lru_cache()
     def redundancy(self):
         return self._length - self._dimension
 
     @property
+    @ft.lru_cache()
     def information_set(self):
         return np.arange(self.redundancy, self._length)
 
     @property
+    @ft.lru_cache()
     def rate(self):
         return self._dimension / self._length
 
     @property
+    @ft.lru_cache()
     def minimum_distance(self):
         # TODO min hamming distance
         raise NotImplementedError
@@ -80,6 +85,12 @@ class BlockCode:
             raise ValueError("length of message is unequal to n")
         return message
 
+    def checkCodeword(self, codeword):
+        raise NotImplementedError
+        # TODO
+        # check if H * codeword ^ T == 0
+        return 1
+
 
 class NonSystematicCode(BlockCode):
 
@@ -89,7 +100,7 @@ class NonSystematicCode(BlockCode):
     def decode(self, codeword):
         if len(codeword) != self.n:
             raise ValueError("length of message is unequal to n")
-        return np.dot(codeword, self._generator_matrix_right_inverse) % 2
+        return np.dot(codeword, numpy.linalg.inv(self.generator_matrix)) % 2
 
 
 class SystematicCode(BlockCode):
@@ -101,4 +112,3 @@ class SystematicCode(BlockCode):
         if len(codeword) != self.n:
             raise ValueError("length of message is unequal to n")
         return codeword[self.information_set]
-
