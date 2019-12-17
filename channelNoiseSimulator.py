@@ -121,7 +121,7 @@ class channelNoiseSimulator:
 
 
 
-c=channelNoiseSimulator()
+#c=channelNoiseSimulator()
 #print c.randomiseBitsList([1,1,1,1,0,0,0,0,1],0.5)
 #print c.randomiseBitsString("1101110",0.5)
 #print c.compareAndHighlightDifferences([1,1,1,0,0,1,1,0,0,1,0,1,1,1],[0,1,1,0,0,1,1,1,1,1,0,1,0,1])
@@ -129,5 +129,5 @@ c=channelNoiseSimulator()
 #rb= c.createRandomBitsString(200)
 #rr = c.randomiseBitsBurstString(rb,0.01,.8,16)
 
-print c.compareAndHighlightDifferences("11110000","11001100")
+#print c.compareAndHighlightDifferences("11110000","11001100")
 #"""
