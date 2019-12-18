@@ -1,6 +1,6 @@
 import simpy, logging, random
 from enum import Enum
-from packet import Packet
+from espy.simulation.packet import Packet
 
 
 class State(Enum):
@@ -27,8 +27,8 @@ class Client(object):
         self.dest = random.choice(other_clients)
         self.msg = "Hello World!"
 
-        self.outgoing = env.process(self.outgoing())
-        self.incoming = env.process(self.incoming())
+        self.outgoing = env.process(self.process_outgoing())
+        self.incoming = env.process(self.process_incoming())
 
     def send_packet(self, dest, msg):
         self.log.info("Send message to %d: %s", dest, msg)
@@ -43,7 +43,7 @@ class Client(object):
         else:
             self.send_packet(packet.sender, "ACK")
 
-    def outgoing(self):
+    def process_outgoing(self):
         while True:
             yield self.env.timeout(1)
 
@@ -54,7 +54,7 @@ class Client(object):
                 self.log.warning("Did not receive ACK. Resending...")
                 self.send_packet(self.dest, self.msg)
 
-    def incoming(self):
+    def process_incoming(self):
         while True:
             try:
                 yield self.env.timeout(1)
