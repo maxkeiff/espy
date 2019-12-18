@@ -122,12 +122,12 @@ class channel_noise_simulator:
 
 
 #c=channel_noise_simulator()
-#print c.randomise_bits_list([1,1,1,1,0,0,0,0,1],0.5)
-#print c.randomise_bits_string("1101110",0.5)
-#print c.compare_and_highlight_differences([1,1,1,0,0,1,1,0,0,1,0,1,1,1],[0,1,1,0,0,1,1,1,1,1,0,1,0,1])
-#print c.create_random_bits_list(200)
+#print (c.randomise_bits_list([1,1,1,1,0,0,0,0,1],0.5))
+#print (c.randomise_bits_string("1101110",0.5))
+#print (c.compare_and_highlight_differences([1,1,1,0,0,1,1,0,0,1,0,1,1,1],[0,1,1,0,0,1,1,1,1,1,0,1,0,1]))
+#print (c.create_random_bits_list(200))
 #rb= c.create_random_bits_string(200)
 #rr = c.randomise_bits_burst_string(rb,0.01,.8,16)
 
-#print c.compare_and_highlight_differences("11110000","11001100")
+#print (c.compare_and_highlight_differences("11110000","11001100"))
 #"""
