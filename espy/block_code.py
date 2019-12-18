@@ -3,9 +3,21 @@ import functools as ft
 
 
 class BlockCode:
+
     def __init__(self, n, k):
         self._length = n
         self._dimension = k
+        self._redundancy = n - k
+        self._rate = k / n
+        self._generator_matrix = np.zeros((k, n), dtype=int)
+        self._parity_check_matrix = np.zeros((n, n - k), dtype=int)
+
+    def __str__(self):
+        return '(' + str(self._length) + ', ' + str(self._dimension) + ')' + '\n' + \
+               self._generator_matrix.__str__() + '\n' + \
+               self._parity_check_matrix.__str__()
+
+    # region Properties
 
     @property
     def length(self):
@@ -16,36 +28,23 @@ class BlockCode:
         return self._dimension
 
     @property
-    @ft.lru_cache()
     def redundancy(self):
-        return self._length - self._dimension
+        return self._redundancy
 
     @property
-    @ft.lru_cache()
-    def information_set(self):
-        return np.arange(self.redundancy, self._length)
-
-    @property
-    @ft.lru_cache()
     def rate(self):
-        return self._dimension / self._length
-
-    @property
-    @ft.lru_cache()
-    def minimum_distance(self):
-        # TODO min hamming distance
-        raise NotImplementedError
-        return 0
+        return self._rate
 
     @property
     def generator_matrix(self):
-        return self.generator
+        return self._generator_matrix
 
     @property
     def parity_check_matrix(self):
-        return self.parity_check
+        return self._parity_check_matrix
 
-    @property
+    # endregion
+
     def codeword_table(self):
         """
         A list of all codewords
@@ -54,18 +53,7 @@ class BlockCode:
         for i in range(2 ** self._dimension):
             message = np.array([(i >> j) & 1 for j in range(self._dimension)])
             codeword_table[i] = self.encode(message)
-        return self.codeword_table
-
-    def create_generator(self):
-        """
-        p is the length of the payload
-        n is the length of the block
-        """
-        # TODO generate matrix
-
-        # self.generator =
-        # self.parity_check =
-        raise NotImplementedError
+        return codeword_table
 
     def encode(self, message):
         """
@@ -73,7 +61,7 @@ class BlockCode:
         """
         if len(message) != self._dimension:
             raise ValueError("length of message is unequal to k")
-        codeword = np.dot(message, self.generator_matrix) % 2
+        codeword = np.dot(message, self._generator_matrix) % 2
         return codeword
 
     def decode(self, codeword):
@@ -82,30 +70,40 @@ class BlockCode:
         """
         if len(codeword) != self._length:
             raise ValueError("length of message is unequal to n")
-        return message
-
-    def checkCodeword(self, codeword):
         raise NotImplementedError
-        # TODO
-        # check if H * codeword ^ T == 0
-        return 1
+
+    def check(self, codeword):
+        raise NotImplementedError
+        # TODO check if H * codeword ^ T == 0
 
 
 class NonSystematicCode(BlockCode):
-    def createGenerator(self, p, n):
-        return super().createGenerator()
+
+    def check(self, codeword):
+        pass
 
     def decode(self, codeword):
         if len(codeword) != self.n:
             raise ValueError("length of message is unequal to n")
-        return np.dot(codeword, numpy.linalg.inv(self.generator_matrix)) % 2
+        return np.dot(codeword, np.linalg.inv(self.generator_matrix)) % 2
 
 
 class SystematicCode(BlockCode):
-    def createGenerator(self, p, n):
-        return super().createGenerator()
+
+    def __init__(self, generator_matrix):
+        k, n = generator_matrix.shape
+        super().__init__(n, k)
+        self._generator_matrix = generator_matrix
+        self._information_set = np.arange(self._redundancy, self._length)
+
+    def check(self, codeword):
+        pass
+
+    @property
+    def information_set(self):
+        return self._information_set
 
     def decode(self, codeword):
-        if len(codeword) != self.n:
+        if len(codeword) != self._length:
             raise ValueError("length of message is unequal to n")
         return codeword[self.information_set]
