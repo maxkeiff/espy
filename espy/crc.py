@@ -66,3 +66,43 @@ class CyclicRedundancyCheck:
         crc = a[-self.n :]
         crc_received = self.compute_crc(message)
         return crc_received == crc
+
+
+class CRC_1(CyclicRedundancyCheck):
+    def __init__(self):
+        super().__init__("10")
+
+
+class CRC_2(CyclicRedundancyCheck):
+    def __init__(self):
+        super().__init__("111")
+
+
+class CRC_3(CyclicRedundancyCheck):
+    def __init__(self):
+        super().__init__("1101")
+
+
+class CRC_8(CyclicRedundancyCheck):
+    def __init__(self):
+        super().__init__("100000111")
+
+
+class CRC_10(CyclicRedundancyCheck):
+    def __init__(self):
+        super().__init__("11000110011")
+
+
+class CRC_12(CyclicRedundancyCheck):
+    def __init__(self):
+        super().__init__("1100000001111")
+
+
+class CRC_16(CyclicRedundancyCheck):
+    def __init__(self):
+        super().__init__("11000000000000101")
+
+
+class CRC_32(CyclicRedundancyCheck):
+    def __init__(self):
+        super().__init__("100000100110000010001110110110111")

@@ -3,7 +3,6 @@ import functools as ft
 
 
 class BlockCode:
-
     def __init__(self, n, k):
         self._length = n
         self._dimension = k
@@ -51,8 +50,8 @@ class BlockCode:
         """
         A list of all codewords
         """
-        codeword_table = np.empty([2**self._dimension, self._length], dtype=np.int)
-        for i in range(2**self._dimension):
+        codeword_table = np.empty([2 ** self._dimension, self._length], dtype=np.int)
+        for i in range(2 ** self._dimension):
             message = np.array([(i >> j) & 1 for j in range(self._dimension)])
             codeword_table[i] = self.encode(message)
         return self.codeword_table
@@ -63,9 +62,9 @@ class BlockCode:
         n is the length of the block
         """
         # TODO generate matrix
-        
-        # self.generator = 
-        # self.parity_check = 
+
+        # self.generator =
+        # self.parity_check =
         raise NotImplementedError
 
     def encode(self, message):
@@ -93,8 +92,7 @@ class BlockCode:
 
 
 class NonSystematicCode(BlockCode):
-
-    def createGenerator(self, p , n):
+    def createGenerator(self, p, n):
         return super().createGenerator()
 
     def decode(self, codeword):
@@ -104,7 +102,6 @@ class NonSystematicCode(BlockCode):
 
 
 class SystematicCode(BlockCode):
-
     def createGenerator(self, p, n):
         return super().createGenerator()
 

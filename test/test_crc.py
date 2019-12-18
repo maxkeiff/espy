@@ -1,5 +1,6 @@
-from espy.crc import CyclicRedundancyCheck
+from espy.crc import *
 import random
+import time
 
 random.seed(42)
 
@@ -41,3 +42,20 @@ def test_crc_decode_encode():
         for message in messages:
             enc = crc.crc_encode(message)
             assert crc.crc_check(enc)
+
+
+def test_predefined_crc_decode_encode():
+
+    start = time.time()
+
+    messages = [bin(random.randint(0, 2 ** 64 - 1))[2:] for _ in range(100)]
+    crcs = [CRC_1(), CRC_2(), CRC_3(), CRC_8(), CRC_10(), CRC_12(), CRC_16(), CRC_32()]
+
+    for crc in crcs:
+        for message in messages:
+            enc = crc.crc_encode(message)
+            assert crc.crc_check(enc)
+
+    end = time.time()
+    total = end - start
+    print("The test took {0:.6f} seconds.".format(total))
