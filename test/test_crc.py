@@ -1,4 +1,4 @@
-from crc import CyclicRedundancyCheck
+from espy.crc import CyclicRedundancyCheck
 import random
 
 random.seed(42)

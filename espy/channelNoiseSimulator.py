@@ -111,7 +111,7 @@ class channelNoiseSimulator:
         """compare two bitlists and higlight the differences"""
         differences = []
         if (len(bits1) != len(bits2)):
-            print "waning, different lengths detected. may result in higher errorrate"
+            print("waning, different lengths detected. may result in higher errorrate")
         minLength = min(len(bits1),len(bits2))
         for i in range(minLength):
             differences.append(1 if bits1[i]!=bits2[i] else 0)
