@@ -72,15 +72,14 @@ class BlockCode:
             raise ValueError("length of message is unequal to n")
         raise NotImplementedError
 
-    def check(self, codeword):
-        raise NotImplementedError
-        # TODO check if H * codeword ^ T == 0
+    def validate(self, codeword):
+        codeword = np.array(codeword)
+        codeword_t = codeword.transpose()
+        res = np.dot(self._parity_check_matrix, codeword_t) % 2
+        return not res.any()
 
 
 class NonSystematicCode(BlockCode):
-
-    def check(self, codeword):
-        pass
 
     def decode(self, codeword):
         if len(codeword) != self.n:
@@ -100,9 +99,6 @@ class SystematicCode(BlockCode):
         sub_matrix = sub_matrix.transpose()
         identity_matrix = np.identity(self._length-self._dimension, dtype=int)
         self._parity_check_matrix = np.hstack((sub_matrix, identity_matrix))
-
-    def check(self, codeword):
-        pass
 
     @property
     def information_set(self):

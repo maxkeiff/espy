@@ -44,3 +44,7 @@ assert(codeword_table == [[0, 0, 0, 0, 0, 0, 0],
                           [0, 1, 1, 1, 1, 1, 1],
                           [1, 1, 1, 1, 0, 0, 1]]).any
 
+# check validate
+assert(systematic_code.validate(codeword))
+assert(not systematic_code.validate([1, 1, 1, 1, 0, 0, 0]))
+
