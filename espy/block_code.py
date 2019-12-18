@@ -95,6 +95,11 @@ class SystematicCode(BlockCode):
         super().__init__(n, k)
         self._generator_matrix = generator_matrix
         self._information_set = np.arange(self._redundancy, self._length)
+        # create parity check matrix
+        sub_matrix = self._generator_matrix[:, self._length-self._dimension+1:]
+        sub_matrix = sub_matrix.transpose()
+        identity_matrix = np.identity(self._length-self._dimension, dtype=int)
+        self._parity_check_matrix = np.hstack((sub_matrix, identity_matrix))
 
     def check(self, codeword):
         pass
