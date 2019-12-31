@@ -58,7 +58,7 @@ class channel_noise_simulator:
         return new_bits
 
     def randomise_bits_burst_list(
-        self, bits, burst_probability, error_rate_in_burst=0.9, max_burst_length=8
+        self, bits, burst_probability, error_rate_in_burst=0.9
     ):
         """A function to simply flip bits with the given probability
             ARGS: a list of bits, the probability for an error[0-1], the maximum length of a burst error,the rate of errors within the bursterror[0-1]
@@ -69,19 +69,16 @@ class channel_noise_simulator:
         i = 0
         while i < len(bits):
             if burst_probability > numpy.random.random():  # roll random numbers
-                curent_burst_length = 0
-                burst_length = numpy.random.randint(1, high=max_burst_length + 1)
+                currently_bursting=True
 
-                while burst_length > curent_burst_length and i < len(
-                    bits
-                ):  # stop on burst end,#stop when bitstream ends (simulate one bursterror and adjust i)
-                    if error_rate - in_burst > numpy.random.random():
+                while currently_bursting and i < len(bits):  #stop when bitstream ends (simulate one bursterror and adjust i)
+                    if error_rate_in_burst > numpy.random.random():
                         new_bits.append(
                             (bits[i] + 1) % 2
                         )  # turn 0 to 1 and 1 to 0 randomly
                     else:
                         new_bits.append(bits[i])
-                    curent_burst_length += 1
+                        currently_bursting = False
                     i += 1
             else:
                 new_bits.append(bits[i])
@@ -101,19 +98,16 @@ class channel_noise_simulator:
         i = 0
         while i < len(bits):
             if burst_probability > numpy.random.random():  # roll random numbers
-                curent_burst_length = 0
-                burst_length = numpy.random.randint(1, high=max_burst_length + 1)
+                currently_bursting=True
 
-                while burst_length > curent_burst_length and i < len(
-                    bits
-                ):  # stop on burst end,#stop when bitstream ends (simulate one bursterror and adjust i)
+                while currently_bursting and i < len(bits):  #stop when bitstream ends (simulate one bursterror and adjust i)
                     if error_rate_in_burst > numpy.random.random():
                         new_bits += str(
                             ((int(bits[i]) + 1) % 2)
                         )  # turn 0 to 1 and 1 to 0 randomly
                     else:
                         new_bits += str(bits[i])
-                    curent_burst_length += 1
+                        currently_bursting = False
                     i += 1
             else:
                 new_bits += str(bits[i])
@@ -134,13 +128,13 @@ class channel_noise_simulator:
         return differences
 
 
-# c=channel_noise_simulator()
+#c=channel_noise_simulator()
 # print (c.randomise_bits_list([1,1,1,1,0,0,0,0,1],0.5))
 # print (c.randomise_bits_string("1101110",0.5))
 # print (c.compare_and_highlight_differences([1,1,1,0,0,1,1,0,0,1,0,1,1,1],[0,1,1,0,0,1,1,1,1,1,0,1,0,1]))
 # print (c.create_random_bits_list(200))
-# rb= c.create_random_bits_string(200)
-# rr = c.randomise_bits_burst_string(rb,0.01,.8,16)
+#rb= c.create_random_bits_string(200)
+#rr = c.randomise_bits_burst_string(rb,0.01,.9)
 
-# print (c.compare_and_highlight_differences("11110000","11001100"))
+#print (c.compare_and_highlight_differences(rb,rr))
 # """
