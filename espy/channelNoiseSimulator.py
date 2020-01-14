@@ -87,7 +87,7 @@ class channel_noise_simulator:
         return new_bits
 
     def randomise_bits_burst_string(
-        self, bits, burst_probability, error_rate_in_burst=0.9, max_burst_length=8
+        self, bits, burst_probability, error_rate_in_burst=0.9,
     ):
         """A function to simply flip bits with the given probability
             ARGS: a list of bits, the probability for an error[0-1], the maximum length of a burst error,the rate of errors within the bursterror[0-1]

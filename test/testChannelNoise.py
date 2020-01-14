@@ -1,4 +1,4 @@
-from espy.channelNoiseSimulator import channelNoiseSimulator
+from espy.channelNoiseSimulator import channel_noise_simulator
 import numpy
 
 numpy.random.seed(42)
