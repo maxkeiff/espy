@@ -19,7 +19,7 @@ def ber_to_abs(data, xlabel):
     """
 
     plt.xlabel(xlabel)
-    plt.ylabel("packets")
+    plt.ylabel("# packets")
     x_axis = np.array(list(data.keys()))
     dict_list = data.values()
 
@@ -31,12 +31,12 @@ def ber_to_abs(data, xlabel):
     false_positives = [d.get("false_postives") for d in dict_list]
     false_negatives = [d.get("false_negatives") for d in dict_list]
 
-    plt.plot(x_axis, positives, "r")
-    plt.plot(x_axis, negatives, "b")
-    plt.plot(x_axis, true_positives, "y")
-    plt.plot(x_axis, true_negatives, "o")
-    plt.plot(x_axis, false_positives, "g")
-    plt.plot(x_axis, false_negatives, "p")
+    plt.plot(x_axis, positives, "og")
+    plt.plot(x_axis, negatives, "or")
+    # plt.plot(x_axis, true_positives, ".b")
+    plt.plot(x_axis, true_negatives, ".c")
+    plt.plot(x_axis, false_positives, ".m")
+    plt.plot(x_axis, false_negatives, ".y")
     plt.show()
 
 

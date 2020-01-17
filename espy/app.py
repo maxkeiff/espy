@@ -1,5 +1,6 @@
 import random
 import logging
+import json
 
 from simulation.simulator import Simulation
 from simulation.error_setup import ErrorSimulationSetup
@@ -8,41 +9,57 @@ import evaluation.charts as charts
 import evaluation.utils as utils
 
 
-SIM_STEPS = 500
+SIM_STEPS = 1000
 
 LOG_LEVEL = logging.WARNING
 
 
-def sim_1():
+def sim_1(file=None):
     simulation_results = {}
-    for i in range(200):
-        p = i / (1000.0)
-        error_setup = SimpleErrorCRCSetup(p=p, packet_size=20)
-        simulation = Simulation(error_setup)
-        simulation_results[p] = simulation.run(SIM_STEPS)
+    if not file:
+        for i in range(200):
+            p = i / (1000.0)
+            error_setup = SimpleErrorCRCSetup(p=p, packet_size=20)
+            simulation = Simulation(error_setup)
+            simulation_results[p] = utils.analyse_packet_list(simulation.run(SIM_STEPS))
 
-    analysed_simulation_results = utils.analyse_simulation_results(simulation_results)
-    charts.ber_to_abs(analysed_simulation_results, "bit flip probability")
+        with open("sim_1.json", "w+") as json_file:
+            json_file.write(json.dumps(simulation_results))
+    else:
+        with open(file, "w+") as json_file:
+            simulation_results = json.loads(json_file.read())
+
+    charts.ber_to_abs(simulation_results, "bit flip probability")
 
 
 def sim_2(
-    x_steps, xmin, xmax, y_steps, ymin, ymax, evaluate_function, y_measurement_function
+    x_steps, xmin, xmax, y_steps, ymin, ymax, evaluate_function, keyword, file=None
 ):
     log = logging.Logger("Simulation")
     simulation_results = []
-    for _y in range(0, y_steps):
-        y = ymin + _y / y_steps * (ymax - ymin)
-        simulation_results_list = []
-        for _x in range(0, x_steps):
-            x = xmin + _x / x_steps * (xmax - xmin)
-            simulation_results_list.append(evaluate_function(x, y))
-            log.warning(
-                "{:.1%} finished".format((_y * x_steps + _x) / (x_steps * y_steps))
-            )
-        simulation_results.append(simulation_results_list)
+
+    if not file:
+        for _y in range(0, y_steps):
+            y = ymin + _y / y_steps * (ymax - ymin)
+            simulation_results_list = []
+            for _x in range(0, x_steps):
+                x = xmin + _x / x_steps * (xmax - xmin)
+                simulation_results_list.append(
+                    utils.analyse_packet_list(evaluate_function(x, y))
+                )
+                log.warning(
+                    "{:.1%} finished".format((_y * x_steps + _x) / (x_steps * y_steps))
+                )
+            simulation_results.append(simulation_results_list)
+
+        with open("sim_2.json", "w+") as json_file:
+            json_file.write(json.dumps(simulation_results))
+    else:
+        with open(file, "r+") as json_file:
+            simulation_results = json.loads(json_file.read())
 
     analysed_simulation_results = utils.analyse_3d_simulation_results(
-        simulation_results, y_measurement_function
+        simulation_results, keyword
     )
     charts.two_dimension_heatmap(analysed_simulation_results, xmin, xmax, ymin, ymax)
 
@@ -68,5 +85,5 @@ if __name__ == "__main__":
         0,
         0.01,
         evaluate_function=evaluate_ber_packet_size,
-        y_measurement_function=utils.count_positives,
+        keyword="positives",
     )
