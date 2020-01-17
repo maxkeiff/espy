@@ -27,7 +27,4 @@ class Simulation:
         self.env.run(until=duration)
         logging.info("Simulation finished")
 
-        for packet in self.sender.get_packets():
-            print(packet)
-
         return self.sender.get_packets()

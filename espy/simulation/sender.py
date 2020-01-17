@@ -57,6 +57,6 @@ class Sender:
     def process_outgoing(self):
         while True:
             yield self.env.timeout(1)
-            time.sleep(1 / 100.0)
+            # time.sleep(1 / 5.0)
             packet_id = next(self.message_generator)
             self.send_packet(packet_id)
