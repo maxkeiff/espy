@@ -67,6 +67,19 @@ class CyclicRedundancyCheck:
         crc_received = self.compute_crc(message)
         return crc_received == crc
 
+    def crc_decode(self, a):
+        """Takes a message and removes CRC bits. Returns the stripped message and a boolean.
+
+        Args:
+            a (str): A bitstring with n CRC bits at the end
+
+        Returns:
+            str: Stripped message.
+            bool: True if CRC evaluates valid.
+        """
+
+        return a[: -self.n], self.crc_check(a)
+
 
 class CRC_1(CyclicRedundancyCheck):
     def __init__(self):

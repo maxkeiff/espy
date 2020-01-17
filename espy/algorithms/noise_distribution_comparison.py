@@ -1,6 +1,6 @@
 
 import numpy
-from channelNoiseSimulator import channel_noise_simulator
+from channel_noise_simulator import channel_noise_simulator
 
 cns = channel_noise_simulator()
 example_data = ""
