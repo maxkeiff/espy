@@ -1,5 +1,8 @@
-from espy.block_code import *
+from espy.algorithms.block_code import *
 import numpy as np
+
+
+assert(hamming([1, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 0]) == [1, 1, 0, 0, 0, 1, 0])
 
 generator = np.array(
     [
