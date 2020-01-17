@@ -19,13 +19,12 @@ def ber_to_abs(data, xlabel):
     """
 
     plt.xlabel(xlabel)
-    plt.ylabel('packets')
+    plt.ylabel("packets")
     x_axis = np.array(list(data.keys()))
     dict_list = data.values()
-    
+
     positives = np.array([d.get("positives") for d in dict_list])
     negatives = np.array([d.get("negatives") for d in dict_list])
-
 
     true_positives = [d.get("true_positives") for d in dict_list]
     true_negatives = [d.get("true_negatives") for d in dict_list]
@@ -41,4 +40,22 @@ def ber_to_abs(data, xlabel):
     plt.show()
 
 
-    
+def two_dimension_heatmap(data, xmin, xmax, ymin, ymax):
+    """
+    Args: 
+        nparray with two dimensions
+    """
+
+    # interpolation gaussian
+    plt.xlabel("x axis")
+    plt.ylabel("y axis")
+    image = plt.imshow(
+        data,
+        cmap="Greens",
+        interpolation="none",
+        extent=[xmin, xmax, ymax, ymin],
+        aspect="auto",
+    )
+
+    plt.colorbar(image)
+    plt.show()
