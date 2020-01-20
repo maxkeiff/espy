@@ -1,3 +1,4 @@
+from itertools import combinations
 import numpy as np
 import functools as ft
 
@@ -5,7 +6,7 @@ import functools as ft
 # region utility
 
 def hamming(x, y):
-    return list(map(lambda z: z[0] ^ z[1], list(zip(x, y))))
+    return list(map(lambda z: z[0] ^ z[1], list(zip(x, y)))).count(1)
 
 
 # endregion
@@ -20,6 +21,7 @@ class BlockCode:
         self._rate = k / n
         self._generator_matrix = np.zeros((k, n), dtype=int)
         self._parity_check_matrix = np.zeros((n, n - k), dtype=int)
+        self._hamming_distance = 0
 
     def __str__(self):
         return '(' + str(self._length) + ', ' + str(self._dimension) + ')' + '\n' + \
@@ -51,6 +53,10 @@ class BlockCode:
     @property
     def parity_check_matrix(self):
         return self._parity_check_matrix
+
+    @property
+    def hamming_distance(self):
+        return self._hamming_distance
 
     # endregion
 
@@ -108,6 +114,8 @@ class SystematicCode(BlockCode):
         sub_matrix = sub_matrix.transpose()
         identity_matrix = np.identity(self._length - self._dimension, dtype=int)
         self._parity_check_matrix = np.hstack((sub_matrix, identity_matrix))
+        word_combos = list(combinations(self.codeword_table(), 2))
+        self._hamming_distance = min(list(map(lambda x: hamming(x[0], x[1]), word_combos)))
 
     @property
     def information_set(self):

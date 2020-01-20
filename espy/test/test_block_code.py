@@ -1,8 +1,8 @@
 from espy.algorithms.block_code import *
-import numpy as np
 
 
-assert(hamming([1, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 0]) == [1, 1, 0, 0, 0, 1, 0])
+# calculates the hamming distance between two vectors
+assert(hamming([1, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 0]) == 3)
 
 generator = np.array(
     [
@@ -60,3 +60,6 @@ assert (
 # check validate
 assert systematic_code.validate(codeword)
 assert not systematic_code.validate([1, 1, 1, 1, 0, 0, 0])
+
+# check hamming distance
+assert (systematic_code.hamming_distance == 1)
