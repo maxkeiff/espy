@@ -1,44 +1,89 @@
 def xor(bit0,bit1):
-    if(bit0==bit1):
+    if bit0 == bit1:
         return "0"
     else:
         return "1"
     
-def cc_encode(message):
-    """Encodes the given message with a rate of 1/2, using the generator polynomials 111 and 110
+def cc_encode(message, constraint_length = 3):
+    """Encodes the given message using convolutional coding (by default with a rate of 1/2, using the generator polynomials 111 and 101)
     
     Args: 
         message (str): a string consisting of 0s and 1s
+        constraint_length (int): number of bits used to calculate parity bits, default is 3 for a rate of 1/2
+        
         
     Returns:
         str: encoded message
     """
-    register = ["0","0","0"]
-    enc_message = []
-    for t in range (0,len(message)):
+    #code rate 1/2 using 3[5,7]
+    if constraint_length == 3:
+        register = ["0","0","0"]
+        enc_message = []
+        for t in range(0,len(message)):
+            #filling register
+            register[2]=register[1]
+            register[1]=register[0]
 
-        register[2]=register[1]
-        register[1]=register[0]
+            register[0]= message[t]
+            
+            #applying generator polynomials 111 and 101
+            enc_message.append(xor(xor(register[0],register[1]),register[2])+xor(register[0],register[2]))
+    #code rate 1/4 using 
+    elif constraint_length == 4:
+        register = ["0","0","0","0"]
+        enc_message = []
+        for t in range(0,len(message)):
+            #filling register
+            register[3]=register[2]
+            register[2]=register[1]
+            register[1]=register[0]
 
-        register[0]= message[t]
-        state = register[0]+ register[1]
-        enc_message.append([])
-
-        enc_message[t] = xor(xor(register[0],register[1]),register[2])+            xor(register[0],register[2])
-
+            register[0]= message[t]
+            
+            #applying generator polynomials 1001,1111,1110,1011
+            enc_bit=""
+            enc_bit += xor(register[0],register[3])
+            enc_bit += xor(xor(xor(register[0],register[1]),register[2]),register[3])
+            enc_bit += xor(xor(register[0],register[1]),register[2])
+            enc_bit += xor(xor(register[0],register[2]),register[3])
+            enc_message.append(enc_bit)
+            
     return enc_message
  
-start_metric = {'zero':0,'one':0, 'two':0,'three':0}
+start_metric = {'A':0,'B':1, 'C':1,'D':1}
 state_machine = {
     #current state, possible branches, branch information
-    'zero': {'b1': {'out_b':"11",'prev_st': 'one','input_b':"0"},
-             'b2': {'out_b':"00",'prev_st': 'zero','input_b':"0"}},
-    'one': {'b1': {'out_b': "01", 'prev_st': 'three', 'input_b':"0"},
-             'b2': {'out_b': "10", 'prev_st': 'two', 'input_b':"0"}},
-    'two': {'b1': {'out_b': "11", 'prev_st': 'zero', 'input_b':"1"},
-             'b2': {'out_b': "00", 'prev_st': 'one', 'input_b':"1"}},
-    'three': {'b1': {'out_b': "10", 'prev_st': 'three', 'input_b':"1"},
-             'b2': {'out_b': "01", 'prev_st': 'two', 'input_b':"1"}},
+    'A': {'b1': {'out_b':"11",'prev_st': 'B','input_b':"0"},
+             'b2': {'out_b':"00",'prev_st': 'A','input_b':"0"}},
+    'B': {'b1': {'out_b': "01", 'prev_st': 'D', 'input_b':"0"},
+             'b2': {'out_b': "10", 'prev_st': 'C', 'input_b':"0"}},
+    'C': {'b1': {'out_b': "11", 'prev_st': 'A', 'input_b':"1"},
+             'b2': {'out_b': "00", 'prev_st': 'B', 'input_b':"1"}},
+    'D': {'b1': {'out_b': "10", 'prev_st': 'D', 'input_b':"1"},
+             'b2': {'out_b': "01", 'prev_st': 'C', 'input_b':"1"}},
+ 
+}
+
+
+start_metric_cons_4 = {'A':0,'B':1, 'C':1,'D':1, 'E':1, 'F':1, 'G':1, 'H':1}
+state_machine_cons_4 = {
+    #current state, possible branches, branch information
+    'A': {'b1': {'out_b':"1101",'prev_st': 'H','input_b':"0"},
+             'b2': {'out_b':"0000",'prev_st': 'A','input_b':"0"}},
+    'B': {'b1': {'out_b': "1111", 'prev_st': 'A', 'input_b':"1"},
+             'b2': {'out_b': "0010", 'prev_st': 'H', 'input_b':"1"}},
+    'C': {'b1': {'out_b': "1001", 'prev_st': 'B', 'input_b':"1"},
+             'b2': {'out_b': "0100", 'prev_st': 'F', 'input_b':"1"}},
+    'D': {'b1': {'out_b': "0011", 'prev_st': 'D', 'input_b':"1"},
+             'b2': {'out_b': "1110", 'prev_st': 'C', 'input_b':"1"}},
+    'E': {'b1': {'out_b':"0110",'prev_st': 'B','input_b':"0"},
+             'b2': {'out_b':"1011",'prev_st': 'F','input_b':"0"}},
+    'F': {'b1': {'out_b': "1000", 'prev_st': 'E', 'input_b':"1"},
+             'b2': {'out_b': "0101", 'prev_st': 'G', 'input_b':"1"}},
+    'G': {'b1': {'out_b': "0001", 'prev_st': 'C', 'input_b':"0"},
+             'b2': {'out_b': "1100", 'prev_st': 'D', 'input_b':"0"}},
+    'H': {'b1': {'out_b': "1010", 'prev_st': 'G', 'input_b':"0"},
+             'b2': {'out_b': "0111", 'prev_st': 'E', 'input_b':"0"}},
  
 }
  
@@ -53,13 +98,18 @@ def cc_decode(rec_message, state_machine, start_metric):
     """Decodes the given message, using the Viterbi algorithm with the given state_machine
     
     Args: 
-        rec_message (str): a string consisting of 0s and 1s
+        rec_message (list): a list of strings of 0s and 1s (usually generated by cc_encode)
         state_machine (set): a set of all possible transient states while encoding a message
         start_metric (set): a set of the startin probabilities for each state
         
     Returns:
         str: decoded message
     """
+    print(rec_message)
+    rec_message.append(len(state_machine['A']['b1']['out_b'])*"0")
+    rec_message.append(len(state_machine['A']['b1']['out_b'])*"0")
+    print(rec_message)  
+        
     V = [{}]
     for st in state_machine:
         #inserting start metric
@@ -91,11 +141,19 @@ def cc_decode(rec_message, state_machine, start_metric):
                 source_state = state_machine[source_state][branch]['prev_st']  
     #reverse dec_message
     dec_message = dec_message [::-1]
+    
+    rec_message = rec_message[0:-2]
+    dec_message = dec_message[0:-2]
     return dec_message
 
 inputs = ("1","0","0","1","1","0","1","0","0","0","1","0","0","0")
-rec_message = (cc_encode(inputs))
-dec_message = cc_decode(rec_message, state_machine, start_metric)
-print(inputs)
-print(dec_message)
-print(bits_diff_num(inputs, dec_message))
+#inputs = ("1","0","0","1","1","0","1","0","0","0","1","0","0","1","1","0","0","1","1","0","1","0","0","0","1","0","0","1")
+rec_message = (cc_encode(inputs,4))
+dec_message = cc_decode(rec_message, state_machine_cons_4, start_metric_cons_4)
+
+print("Eingabe:",inputs)
+print("Encodiert:",rec_message)
+print("Decodiert:",dec_message)
+print("Anzahl Unterschiede:",bits_diff_num(inputs, dec_message))
+
+#print(cc_encode("110011111",4))
