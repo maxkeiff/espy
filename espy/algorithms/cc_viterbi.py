@@ -105,10 +105,8 @@ def cc_decode(rec_message, state_machine, start_metric):
     Returns:
         str: decoded message
     """
-    print(rec_message)
     rec_message.append(len(state_machine['A']['b1']['out_b'])*"0")
     rec_message.append(len(state_machine['A']['b1']['out_b'])*"0")
-    print(rec_message)  
         
     V = [{}]
     for st in state_machine:
