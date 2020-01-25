@@ -1,24 +1,64 @@
+def encode_message(message, rate=0.5):
+    """Encodes a given message using a convolutional encoder with the specified rate
+    Args:
+        message (str): a string consisting of 0s and 1s
+        rate (float): the rate of the encoder, currently available are 0.25, 0.5 and 0.75
+    Returns:
+        list: a list of strings which represents the encoded message
+    """
+    message = message + "000"
+    if rate == 0.25:
+        return cc_encode(message,4)
+    elif rate == 0.5:
+        return cc_encode(message,3)
+    elif rate == 0.75:
+        return cc_encode(message,3,True)
+    else:
+        print("No such rate available.")
+        
+def decode_message(message, rate=0.5):
+    """Decodes a given message using a convolutional decoder with the specified rate
+    Args:
+        message (list): a message encoded by the function encode_message
+        rate (float): the rate of the encoder, currently available are 0.25, 0.5 and 0.75
+    Returns:
+        list: a list of strings which represents the decoded message
+    """
+    if rate == 0.25:
+        dec_message = cc_decode(message, state_machine_cons_4, start_metric_cons_4)
+        return dec_message[0:-3]
+    elif rate == 0.5:
+        dec_message = cc_decode(message, state_machine, start_metric)
+        return dec_message[0:-3]
+    elif rate == 0.75:
+        dec_message = cc_decode(message, state_machine, start_metric, True)
+        return dec_message[0:-3]
+    else:
+        print("No such rate available")
+
 def xor(bit0,bit1):
     if bit0 == bit1:
         return "0"
     else:
         return "1"
     
-def cc_encode(message, constraint_length = 3):
+def cc_encode(message, constraint_length = 3, punctured = False):
     """Encodes the given message using convolutional coding (by default with a rate of 1/2, using the generator polynomials 111 and 101)
     
     Args: 
         message (str): a string consisting of 0s and 1s
         constraint_length (int): number of bits used to calculate parity bits, default is 3 for a rate of 1/2
-        
+        punctured (bool): whether puncturing is used or not (only available for rate constraint_length 3)
         
     Returns:
-        str: encoded message
+        list: encoded message
     """
     #code rate 1/2 using 3[5,7]
+    enc_message =[]
     if constraint_length == 3:
         register = ["0","0","0"]
-        enc_message = []
+        
+        punct_count = 0
         for t in range(0,len(message)):
             #filling register
             register[2]=register[1]
@@ -27,11 +67,23 @@ def cc_encode(message, constraint_length = 3):
             register[0]= message[t]
             
             #applying generator polynomials 111 and 101
-            enc_message.append(xor(xor(register[0],register[1]),register[2])+xor(register[0],register[2]))
+            if punctured == False:
+                enc_message.append(xor(xor(register[0],register[1]),register[2])+xor(register[0],register[2]))
+            else:
+                #puncturing code, using the puncturing matrix consisting of the rows (110) and (101), thus resulting in rate 3/4
+                if punct_count == 0:
+                    enc_message.append(xor(xor(register[0],register[1]),register[2])+xor(register[0],register[2]))
+                    punct_count = (punct_count+1)%3 
+                elif punct_count == 1:
+                    enc_message.append(xor(xor(register[0],register[1]),register[2]))
+                    punct_count = (punct_count+1)%3
+                else:
+                    enc_message.append(xor(register[0],register[2]))
+                    punct_count = (punct_count+1)%3
+                    
     #code rate 1/4 using 
     elif constraint_length == 4:
         register = ["0","0","0","0"]
-        enc_message = []
         for t in range(0,len(message)):
             #filling register
             register[3]=register[2]
@@ -47,7 +99,7 @@ def cc_encode(message, constraint_length = 3):
             enc_bit += xor(xor(register[0],register[1]),register[2])
             enc_bit += xor(xor(register[0],register[2]),register[3])
             enc_message.append(enc_bit)
-            
+    
     return enc_message
  
 start_metric = {'A':0,'B':1, 'C':1,'D':1}
@@ -94,7 +146,7 @@ def bits_diff_num(num_1,num_2):
             diff+=1
     return diff
  
-def cc_decode(rec_message, state_machine, start_metric):
+def cc_decode(rec_message, state_machine, start_metric, punctured = False):
     """Decodes the given message, using the Viterbi algorithm with the given state_machine
     
     Args: 
@@ -105,33 +157,45 @@ def cc_decode(rec_message, state_machine, start_metric):
     Returns:
         str: decoded message
     """
-    rec_message.append(len(state_machine['A']['b1']['out_b'])*"0")
-    rec_message.append(len(state_machine['A']['b1']['out_b'])*"0")
+
         
     V = [{}]
     for st in state_machine:
         #inserting start metric
         V[0][st] = {"metric": start_metric[st]}     
-    
+
     for t in range(1, len(rec_message)+1):
         V.append({})
+        punct_count = 0
         for st in state_machine:
-            
             prev_st = state_machine[st]['b1']['prev_st']
-            first_b_metric = V[(t-1)][prev_st]["metric"] + bits_diff_num(state_machine[st]['b1']['out_b'], rec_message[t - 1])
+            if punctured == False or punct_count == 0:
+                first_b_metric = V[(t-1)][prev_st]["metric"] + bits_diff_num(state_machine[st]['b1']['out_b'], rec_message[t - 1])
+            elif punct_count == 1:
+                first_b_metric = V[(t-1)][prev_st]["metric"] + bits_diff_num(state_machine[st]['b1']['out_b'][0], rec_message[t - 1][0])
+            elif punct_count == 2:
+                first_b_metric = V[(t-1)][prev_st]["metric"] + bits_diff_num(state_machine[st]['b1']['out_b'][1], rec_message[t - 1][1])
             prev_st = state_machine[st]['b2']['prev_st']
             second_b_metric = V[(t - 1)][prev_st]["metric"] + bits_diff_num(state_machine[st]['b2']['out_b'], rec_message[t - 1])
+            if punctured == False or punct_count == 0:
+                second_b_metric = V[(t - 1)][prev_st]["metric"] + bits_diff_num(state_machine[st]['b2']['out_b'], rec_message[t - 1])
+            elif punct_count == 1:
+                second_b_metric = V[(t - 1)][prev_st]["metric"] + bits_diff_num(state_machine[st]['b2']['out_b'][0], rec_message[t - 1][0])
+            elif punct_count == 2:
+                second_b_metric = V[(t - 1)][prev_st]["metric"] + bits_diff_num(state_machine[st]['b2']['out_b'][1], rec_message[t - 1][1])
+            
+            punct_count = (punct_count+1)%3
             
             if first_b_metric > second_b_metric:
                 V[t][st] = {"metric" : second_b_metric,"branch":'b2'}
             else:
                 V[t][st] = {"metric": first_b_metric, "branch": 'b1'}
-
-    smaller = min(V[t][st]["metric"] for st in state_machine)
+                
+    min_metric = min(V[t][st]["metric"] for st in state_machine)
     #traceback most likely path
     dec_message=[]
     for st in state_machine:
-        if V[len(rec_message)-1][st]["metric"] == smaller:
+        if V[len(rec_message)-1][st]["metric"] == min_metric:
             source_state = st
             for t in range(len(rec_message),0,-1):
                 branch = V[t][source_state]["branch"]
@@ -140,18 +204,4 @@ def cc_decode(rec_message, state_machine, start_metric):
     #reverse dec_message
     dec_message = dec_message [::-1]
     
-    rec_message = rec_message[0:-2]
-    dec_message = dec_message[0:-2]
     return dec_message
-
-inputs = ("1","0","0","1","1","0","1","0","0","0","1","0","0","0")
-#inputs = ("1","0","0","1","1","0","1","0","0","0","1","0","0","1","1","0","0","1","1","0","1","0","0","0","1","0","0","1")
-rec_message = (cc_encode(inputs,4))
-dec_message = cc_decode(rec_message, state_machine_cons_4, start_metric_cons_4)
-
-print("Eingabe:",inputs)
-print("Encodiert:",rec_message)
-print("Decodiert:",dec_message)
-print("Anzahl Unterschiede:",bits_diff_num(inputs, dec_message))
-
-#print(cc_encode("110011111",4))
