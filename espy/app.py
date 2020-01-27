@@ -5,6 +5,8 @@ import json
 from simulation.simulator import Simulation
 from simulation.error_setup import ErrorSimulationSetup
 from setups.simulation_simple_error_crc import SimpleErrorCRCSetup
+
+from setups.simulation_burst_error_crc import BurstErrorCRCSetup
 import evaluation.charts as charts
 import evaluation.utils as utils
 
@@ -63,6 +65,23 @@ def sim_2(
     )
     charts.two_dimension_heatmap(analysed_simulation_results, xmin, xmax, ymin, ymax)
 
+def sim_3(file=None):
+    simulation_results = {}
+    if not file:
+        for i in range(200):
+            p = i / (1000.0)
+            error_setup = BurstErrorCRCSetup(p_enter=0.01,p_leave=0.001)
+            simulation = Simulation(error_setup)
+            simulation_results[p] = utils.analyse_packet_list(simulation.run(SIM_STEPS))
+
+        with open("sim_1.json", "w+") as json_file:
+            json_file.write(json.dumps(simulation_results))
+    else:
+        with open(file, "w+") as json_file:
+            simulation_results = json.loads(json_file.read())
+
+    charts.ber_to_abs(simulation_results, "bit flip probability")
+
 
 def evaluate_ber_packet_size(packet_size, probability):
     error_setup = SimpleErrorCRCSetup(p=probability, packet_size=int(packet_size))
@@ -77,7 +96,7 @@ if __name__ == "__main__":
         format="[%(levelname)-7s] %(name)8s: %(message)s", level=LOG_LEVEL
     )
 
-    sim_2(
+    '''sim_2(
         20,
         100,
         2000,
@@ -86,4 +105,5 @@ if __name__ == "__main__":
         0.01,
         evaluate_function=evaluate_ber_packet_size,
         keyword="positives",
-    )
+    )'''
+    sim_3()
