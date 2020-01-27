@@ -69,10 +69,10 @@ def sim_3(file=None):
     simulation_results = {}
     if not file:
         for i in range(200):
-            p = i / (1000.0)
-            error_setup = BurstErrorCRCSetup(p_enter=0.01,p_leave=0.001)
+            error_density_multiplyer = i/10
+            error_setup = BurstErrorCRCSetup(p_enter=(0.001*error_density_multiplyer),p_leave=(1-(0.01*error_density_multiplyer)),packet_size=20 )
             simulation = Simulation(error_setup)
-            simulation_results[p] = utils.analyse_packet_list(simulation.run(SIM_STEPS))
+            simulation_results[error_density_multiplyer] = utils.analyse_packet_list(simulation.run(SIM_STEPS))
 
         with open("sim_1.json", "w+") as json_file:
             json_file.write(json.dumps(simulation_results))
