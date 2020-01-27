@@ -61,7 +61,7 @@ class channel_noise_simulator:
         self, bits, burst_probability, error_rate_in_burst=0.9
     ):
         """A function to simply flip bits with the given probability
-            ARGS: a list of bits, the probability for an error[0-1], the maximum length of a burst error,the rate of errors within the bursterror[0-1]
+            ARGS: a list of bits, the probability for an error[0-1], the probability to leave the bursterror[0-1]
             Return: list of bits with added burst erorrs
         """
 
@@ -90,7 +90,7 @@ class channel_noise_simulator:
         self, bits, burst_probability, error_rate_in_burst=0.9,
     ):
         """A function to simply flip bits with the given probability
-            ARGS: a list of bits, the probability for an error[0-1], the maximum length of a burst error,the rate of errors within the bursterror[0-1]
+            ARGS: a String of bits, the probability for an error[0-1], the probability to leave the bursterror[0-1]
             Return: String of bits with added burst erorrs
         """
 
