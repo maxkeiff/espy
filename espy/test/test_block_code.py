@@ -1,8 +1,7 @@
 from espy.algorithms.block_code import *
 
-
 # calculates the hamming distance between two vectors
-assert(hamming([1, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 0]) == 3)
+assert (hamming([1, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 0]) == 3)
 
 generator = np.array(
     [
@@ -18,8 +17,8 @@ systematic_code = SystematicCode(generator)
 print(systematic_code.__str__())
 # check parity matrix
 assert (
-    systematic_code.parity_check_matrix
-    == [[1, 1, 0, 0, 1, 0, 0], [1, 0, 1, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 1]]
+        systematic_code.parity_check_matrix
+        == [[1, 1, 0, 0, 1, 0, 0], [1, 0, 1, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 1]]
 ).any
 parity_t = systematic_code.parity_check_matrix.transpose()
 assert (np.dot(generator, parity_t) % 2 == 0).any
@@ -36,25 +35,25 @@ assert (decoded_message == message).any
 # check code word table
 codeword_table = systematic_code.codeword_table()
 assert (
-    codeword_table
-    == [
-        [0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 0, 1, 1, 0],
-        [0, 1, 0, 0, 1, 0, 0],
-        [1, 1, 0, 0, 0, 1, 0],
-        [0, 0, 1, 0, 0, 1, 1],
-        [1, 0, 1, 0, 1, 0, 1],
-        [0, 1, 1, 0, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1],
-        [0, 0, 0, 1, 0, 0, 0],
-        [1, 0, 0, 1, 1, 1, 0],
-        [0, 1, 0, 1, 1, 0, 0],
-        [1, 1, 0, 1, 0, 1, 0],
-        [0, 0, 1, 1, 0, 1, 1],
-        [1, 0, 1, 1, 1, 0, 1],
-        [0, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 0, 0, 1],
-    ]
+        codeword_table
+        == [
+            [0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 1, 1, 0],
+            [0, 1, 0, 0, 1, 0, 0],
+            [1, 1, 0, 0, 0, 1, 0],
+            [0, 0, 1, 0, 0, 1, 1],
+            [1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 1, 0, 1, 1, 1],
+            [1, 1, 1, 0, 0, 0, 1],
+            [0, 0, 0, 1, 0, 0, 0],
+            [1, 0, 0, 1, 1, 1, 0],
+            [0, 1, 0, 1, 1, 0, 0],
+            [1, 1, 0, 1, 0, 1, 0],
+            [0, 0, 1, 1, 0, 1, 1],
+            [1, 0, 1, 1, 1, 0, 1],
+            [0, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 0, 0, 1],
+        ]
 ).any
 
 # check validate
@@ -63,3 +62,27 @@ assert not systematic_code.validate([1, 1, 1, 1, 0, 0, 0])
 
 # check hamming distance
 assert (systematic_code.hamming_distance == 1)
+
+generator = np.array(
+    [
+        [0, 1, 1, 0, 1, 1, 0],
+        [1, 1, 0, 1, 1, 0, 0],
+        [1, 0, 1, 1, 0, 1, 1],
+        [0, 0, 0, 1, 0, 0, 0],
+    ]
+)
+
+
+# check maximum likelihood decoding
+# print(systematic_code.maximum_likelihood_decode([1, 1, 1, 1, 1, 0, 1]))
+
+print('\n')
+
+# check hamming code
+hamming_code = HammingCode(3)
+print(hamming_code)
+
+codeword = hamming_code.encode(np.array([1, 0, 1, 1]))
+assert(codeword == [1, 0, 1, 1, 0, 1, 0]).any
+message = hamming_code.decode(np.array([0, 1, 0, 0, 0, 1, 1]))
+assert(message == [1, 1, 0, 0]).any
