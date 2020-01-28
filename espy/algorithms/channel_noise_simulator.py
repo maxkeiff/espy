@@ -57,6 +57,25 @@ class channel_noise_simulator:
 
         return new_bits
 
+    def randomise_bits_string_list(bits, probability):
+    """A function to simply flip bits with the given probability
+        ARGS: a list of bits, the probability for an error[0-1]
+        RETURN: a list of bits
+    """
+
+    new_bits = []
+    for b in bits:
+        new_bit =""
+        for i in range(len(b)):
+            if probability > numpy.random.random():  # roll random numbers
+                new_bit += str((int(b[i]) + 1) % 2) # turn 0 to 1 and 1 to 0
+            else:
+                new_bit += str(b[i])
+        
+        new_bits.append(new_bit)
+
+    return new_bits
+    
     def randomise_bits_burst_list(
         self, bits, burst_probability, error_rate_in_burst=0.9
     ):
