@@ -5,6 +5,7 @@ import json
 from simulation.simulator import Simulation
 from simulation.error_setup import ErrorSimulationSetup
 from setups.simulation_simple_error_crc import SimpleErrorCRCSetup
+from setups.simulation_simple_error_viterbi import SimpleErrorViterbiSetup
 
 from setups.simulation_burst_error_crc import BurstErrorCRCSetup
 from setups.simulation_burst_error import BurstErrorSetup
@@ -12,7 +13,7 @@ import evaluation.charts as charts
 import evaluation.utils as utils
 
 
-SIM_STEPS = 1000
+SIM_STEPS = 100
 
 LOG_LEVEL = logging.WARNING
 
@@ -22,7 +23,8 @@ def sim_1(file=None):
     if not file:
         for i in range(200):
             p = i / (1000.0)
-            error_setup = SimpleErrorCRCSetup(p=p, packet_size=20)
+            # error_setup = SimpleErrorCRCSetup(p=p, packet_size=20)
+            error_setup = SimpleErrorViterbiSetup(p=p, rate=0.25, packet_size=100)
             simulation = Simulation(error_setup)
             simulation_results[p] = utils.analyse_packet_list(simulation.run(SIM_STEPS))
 
@@ -125,4 +127,5 @@ if __name__ == "__main__":
         evaluate_function=evaluate_ber_packet_size,
         keyword="positives",
     )'''
-    sim_3()
+    # sim_3()
+    sim_1()
