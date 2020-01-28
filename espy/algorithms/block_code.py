@@ -1,6 +1,5 @@
-from itertools import combinations
+import itertools
 import numpy as np
-import functools as ft
 
 
 # region utility
@@ -88,18 +87,41 @@ class BlockCode:
         raise NotImplementedError
 
     def validate(self, codeword):
+        """
+        Validates whether a codeword belongs to this block code or not
+        """
         codeword = np.array(codeword)
         codeword_t = codeword.transpose()
         res = np.dot(self._parity_check_matrix, codeword_t) % 2
         return not res.any()
 
+    def maximum_likelihood_decode(self, codeword):
+        """
+        Selects the message with the smallest hamming distance to the decoded codeword
+        """
+        try:
+            self.decode(codeword)
+        except TypeError:
+            # TODO expanding ring search
+            return 0
+
 
 class NonSystematicCode(BlockCode):
+
+    def __init__(self, generator_matrix):
+        k, n = generator_matrix.shape
+        super().__init__(n, k)
+        self._generator_matrix = generator_matrix
+        # create parity check matrix
+        # TODO calculate parity check matrix
+        # calculate hamming distance
+        word_combos = list(itertools.combinations(self.codeword_table(), 2))
+        self._hamming_distance = min(list(map(lambda x: hamming(x[0], x[1]), word_combos)))
 
     def decode(self, codeword):
         if len(codeword) != self.n:
             raise ValueError("length of message is unequal to n")
-        return np.dot(codeword, np.linalg.inv(self.generator_matrix)) % 2
+        return np.dot(codeword, self.parity_check_matrix) % 2
 
 
 class SystematicCode(BlockCode):
@@ -114,7 +136,67 @@ class SystematicCode(BlockCode):
         sub_matrix = sub_matrix.transpose()
         identity_matrix = np.identity(self._length - self._dimension, dtype=int)
         self._parity_check_matrix = np.hstack((sub_matrix, identity_matrix))
-        word_combos = list(combinations(self.codeword_table(), 2))
+        # calculate hamming distance
+        word_combos = list(itertools.combinations(self.codeword_table(), 2))
+        self._hamming_distance = min(list(map(lambda x: hamming(x[0], x[1]), word_combos)))
+
+    @property
+    def information_set(self):
+        return self._information_set
+
+    def decode(self, codeword):
+        if len(codeword) != self._length:
+            raise ValueError("length of message is unequal to n")
+        return codeword[self.information_set]
+
+
+class HammingCode(BlockCode):
+
+    def __init__(self, redundancy, extended=False, information_set='left'):
+        # default init of super class
+        super().__init__(1, 1)
+
+        # create parity check sub matrix
+        parity_sub_matrix = np.zeros((2**redundancy - redundancy - 1, redundancy), dtype=np.int)
+        i = 0
+        for w in range(2, redundancy + 1):
+            for idx in itertools.combinations(range(redundancy), w):
+                parity_sub_matrix[i, list(idx)] = 1
+                i += 1
+        self.extended = extended
+        if extended:
+            last_column = (1 + np.sum(parity_sub_matrix, axis=1)) % 2
+            extended_parity_sub_matrix = np.hstack([parity_sub_matrix, last_column[np.newaxis].T])
+            parity_sub_matrix = extended_parity_sub_matrix
+
+        ####
+
+        self._parity_sub_matrix = np.array(parity_sub_matrix, dtype=np.int) % 2
+        self._dimension, self._redundancy = self._parity_sub_matrix.shape
+        self._length = self._dimension + self._redundancy
+        #
+        if information_set == 'left':
+            information_set = np.arange(self._dimension)
+        elif information_set == 'right':
+            information_set = np.arange(self._redundancy, self._length)
+        self._information_set = np.array(information_set, dtype=np.int)
+        if self._information_set.size != self._dimension or \
+                self._information_set.min() < 0 or self._information_set.max() > self._length:
+            raise ValueError("Parameter 'information_set' must be a 'k'-subset of 'range(n)'")
+
+        # create generator matrix
+        self._parity_set = np.setdiff1d(np.arange(self._length), self._information_set)
+        self._generator_matrix = np.empty((self._dimension, self._length), dtype=np.int)
+        self._generator_matrix[:, self._information_set] = np.eye(self._dimension, dtype=np.int)
+        self._generator_matrix[:, self._parity_set] = self._parity_sub_matrix
+
+        # create parity check matrix
+        self._parity_check_matrix = np.empty((self._redundancy, self._length), dtype=np.int)
+        self._parity_check_matrix[:, self._information_set] = self._parity_sub_matrix.T
+        self._parity_check_matrix[:, self._parity_set] = np.eye(self._redundancy, dtype=np.int)
+
+        # calculate hamming distance
+        word_combos = list(itertools.combinations(self.codeword_table(), 2))
         self._hamming_distance = min(list(map(lambda x: hamming(x[0], x[1]), word_combos)))
 
     @property
