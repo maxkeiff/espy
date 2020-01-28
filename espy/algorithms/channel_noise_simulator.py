@@ -57,7 +57,7 @@ class channel_noise_simulator:
 
         return new_bits
 
-    def randomise_bits_string_list(bits, probability):
+    def randomise_bits_string_list(self,bits, probability):
     """A function to simply flip bits with the given probability
         ARGS: a list of bits, the probability for an error[0-1]
         RETURN: a list of bits
@@ -75,6 +75,35 @@ class channel_noise_simulator:
         new_bits.append(new_bit)
 
     return new_bits
+    
+    def randomise_bits_burst_string_list(self,bits, burst_probability, error_rate_in_burst=0.9,):
+    """A function to simply flip bits with the given probability
+       ARGS: a String of bits, the probability for an error[0-1], the probability to leave the bursterror[0-1]
+        Return: String of bits with added burst error
+    """
+
+    new_bits = []
+    currently_bursting = False
+    for b in bits:
+        i = 0
+        new_bits.append("")
+        while i < len(b):
+            if burst_probability > numpy.random.random():  # roll random numbers
+                currently_bursting=True
+                
+                while currently_bursting and i < len(b):  #stop when bitstream ends (simulate one bursterror and adjust i)
+                    if error_rate_in_burst > numpy.random.random():
+                        new_bits[len(new_bits)-1] += str(((int(b[i]) + 1) % 2))  # turn 0 to 1 and 1 to 0 randomly
+                    else:
+                        new_bits[len(new_bits)-1] += str(b[i])
+                        currently_bursting = False
+                    i += 1
+            else:
+                new_bits[len(new_bits)-1] += str(b[i])
+                i += 1
+
+    return new_bits
+
     
     def randomise_bits_burst_list(
         self, bits, burst_probability, error_rate_in_burst=0.9
