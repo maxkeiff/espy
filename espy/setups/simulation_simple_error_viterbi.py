@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
-
 from simulation.error_setup import ErrorSimulationSetup
 from algorithms.cc_viterbi import *
 from algorithms.channel_noise_simulator import channel_noise_simulator
@@ -24,4 +18,3 @@ class SimpleErrorViterbiSetup(ErrorSimulationSetup):
     def apply_channel(self, bitstring):
         new_bitstring = cns.randomise_bits_string_list(bitstring,self.p)
         return new_bitstring
-
