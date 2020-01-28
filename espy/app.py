@@ -57,7 +57,7 @@ def sim_2(
                 )
             simulation_results.append(simulation_results_list)
 
-        with open("sim_2.json", "w+") as json_file:
+        with open("sim_3.json", "w+") as json_file:
             json_file.write(json.dumps(simulation_results))
     else:
         with open(file, "r+") as json_file:
@@ -105,7 +105,8 @@ def sim_4(file=None):#burst only
 
 
 def evaluate_ber_packet_size(packet_size, probability):
-    error_setup = SimpleErrorCRCSetup(p=probability, packet_size=int(packet_size))
+    # error_setup = SimpleErrorCRCSetup(p=probability, packet_size=int(packet_size))
+    error_setup = SimpleErrorViterbiSetup(p=probability, rate=0.5, packet_size=int(packet_size))
     simulation = Simulation(error_setup)
     return simulation.run(SIM_STEPS)
 
@@ -117,15 +118,15 @@ if __name__ == "__main__":
         format="[%(levelname)-7s] %(name)8s: %(message)s", level=LOG_LEVEL
     )
 
-    '''sim_2(
-        20,
+    sim_2(
+        10,
         100,
         2000,
-        100,
+        50,
         0,
         0.01,
         evaluate_function=evaluate_ber_packet_size,
         keyword="positives",
-    )'''
+    )
     # sim_3()
-    sim_1()
+    # sim_1()
