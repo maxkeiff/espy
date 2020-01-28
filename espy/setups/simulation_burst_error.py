@@ -2,7 +2,7 @@ from simulation.error_setup import ErrorSimulationSetup
 from algorithms.channel_noise_simulator import channel_noise_simulator
 
 
-class SimpleErrorCRCSetup(ErrorSimulationSetup):
+class BurstErrorSetup(ErrorSimulationSetup):
     def __init__(self, p_enter,p_leave, *args, **kwargs):
         """Initializes a Simulation Setup with only Bursterrors and probability p_enter to start bursting
          and probability p_leave to stop bursting"""
