@@ -47,8 +47,8 @@ def two_dimension_heatmap(data, xmin, xmax, ymin, ymax):
     """
 
     # interpolation gaussian
-    plt.xlabel("x axis")
-    plt.ylabel("y axis")
+    plt.xlabel("Packet size (bit)")
+    plt.ylabel("bit error rate")
     image = plt.imshow(
         data,
         cmap="Greens",
