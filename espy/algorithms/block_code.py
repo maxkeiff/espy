@@ -99,12 +99,9 @@ class BlockCode:
         """
         Selects the message with the smallest hamming distance to the decoded codeword
         """
-        try:
-            message = self.decode(np.array(codeword))
-            return message
-        except TypeError:
-            # TODO expanding ring search
-            return 0
+        message = self.decode(np.array(codeword))
+        # TODO
+        return message
 
 
 class NonSystematicCode(BlockCode):
