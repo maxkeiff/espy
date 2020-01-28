@@ -100,7 +100,8 @@ class BlockCode:
         Selects the message with the smallest hamming distance to the decoded codeword
         """
         try:
-            self.decode(codeword)
+            message = self.decode(np.array(codeword))
+            return message
         except TypeError:
             # TODO expanding ring search
             return 0
@@ -195,9 +196,7 @@ class HammingCode(BlockCode):
         self._parity_check_matrix[:, self._information_set] = self._parity_sub_matrix.T
         self._parity_check_matrix[:, self._parity_set] = np.eye(self._redundancy, dtype=np.int)
 
-        # calculate hamming distance
-        word_combos = list(itertools.combinations(self.codeword_table(), 2))
-        self._hamming_distance = min(list(map(lambda x: hamming(x[0], x[1]), word_combos)))
+        self._hamming_distance = redundancy
 
     @property
     def information_set(self):

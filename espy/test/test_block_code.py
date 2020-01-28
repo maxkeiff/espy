@@ -72,9 +72,8 @@ generator = np.array(
     ]
 )
 
-
 # check maximum likelihood decoding
-# print(systematic_code.maximum_likelihood_decode([1, 1, 1, 1, 1, 0, 1]))
+print(systematic_code.maximum_likelihood_decode([1, 1, 1, 1, 1, 0, 1]))
 
 print('\n')
 
@@ -83,6 +82,9 @@ hamming_code = HammingCode(3)
 print(hamming_code)
 
 codeword = hamming_code.encode(np.array([1, 0, 1, 1]))
-assert(codeword == [1, 0, 1, 1, 0, 1, 0]).any
+assert (codeword == [1, 0, 1, 1, 0, 1, 0]).any
 message = hamming_code.decode(np.array([0, 1, 0, 0, 0, 1, 1]))
-assert(message == [1, 1, 0, 0]).any
+assert (message == [1, 1, 0, 0]).any
+
+hamming_code = HammingCode(5, extended=True)
+print(hamming_code)
