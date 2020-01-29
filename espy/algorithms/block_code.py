@@ -99,21 +99,30 @@ class BlockCode:
         """
         Selects the message with the smallest hamming distance to the decoded codeword
         """
-        for i in range(self._hamming_distance):
-            codes = [np.array(codeword)]
-            for j in range(i):
+        codeword_array = np.array(codeword)
+        all_codes = list()
+        all_codes.append(codeword_array)
+        for i in range(len(codeword_array)):
+            codes = [codeword_array]
+            for j in range(i+1):
                 new_codes = []
                 for code in codes:
                     for k in range(len(code)):
                         x = code.copy()
                         x[k] = 1 - x[k]
-                        new_codes.append(x)
+                        x_not_in_all_codes = len(list(filter (lambda y : np.array_equal(x, y) == True, all_codes))) == 0
+                        x_not_in_new_codes = len(list(filter (lambda y : np.array_equal(x, y) == True, new_codes))) == 0
+                        if (j < i or x_not_in_all_codes):
+                            if x_not_in_new_codes:
+                                new_codes.append(x)
+                            if x_not_in_all_codes:
+                                all_codes.append(x)
                 codes = new_codes.copy()
-            print("Hamming dist", i + 1, codes)
+            print("dist", i + 1, "len", len(codes), codes)
             for code in codes:
-                if self._parity_check_matrix.dot(np.transpose(code)).all() == 0:
+                if all(self._parity_check_matrix.dot(np.transpose(code)) == [0,0,0]):
                     print(code, self._parity_check_matrix.dot(np.transpose(code)))
-                    break
+                    return
 
 
 class NonSystematicCode(BlockCode):

@@ -79,13 +79,15 @@ hamming_code = HammingCode(3)
 print(hamming_code)
 
 codeword = hamming_code.encode(np.array([1, 0, 1, 1]))
-assert (codeword == [1, 0, 1, 1, 0, 1, 0]).any
+assert all(codeword == [1, 0, 1, 1, 0, 1, 0])
 message = hamming_code.decode(np.array([0, 1, 0, 0, 0, 1, 1]))
-assert (message == [1, 1, 0, 0]).any
+assert all(message == [0, 1, 0, 0])
+message = hamming_code.decode(np.array([1, 0, 1, 1, 0, 1, 0]))
+assert all(message == [1, 0, 1, 1])
 
 ########################################################################################################################
 
 print('###')
 
 # check maximum likelihood decoding
-hamming_code.maximum_likelihood_decode([1, 1, 1, 1, 1, 0, 1])
+hamming_code.maximum_likelihood_decode([1, 0, 1, 1, 0, 1, 1])
