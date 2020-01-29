@@ -6,5 +6,5 @@ Always use strings containing "0" and "1" only as messages.
 
 Some example plots:
 
-![alt](example_plot.png)
-![alt](example_plot_2.png)
+![alt](espy/presentation/example_plot.png)
+![alt](espy/presentation/example_plot_2.png)

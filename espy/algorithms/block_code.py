@@ -74,7 +74,7 @@ class BlockCode:
         Encodes a message to a codeword
         """
         if len(message) != self._dimension:
-            raise ValueError("length of message is unequal to k")
+            raise ValueError("length {} of message is unequal to k {}".format(len(message), self._dimension))
         codeword = np.dot(message, self._generator_matrix) % 2
         return codeword
 
@@ -83,7 +83,7 @@ class BlockCode:
         Decodes the message from a codeword
         """
         if len(codeword) != self._length:
-            raise ValueError("length of message is unequal to n")
+            raise ValueError("length {} of message is unequal to n {}".format(len(codeword), self._length))
         raise NotImplementedError
 
     def validate(self, codeword):
@@ -138,8 +138,8 @@ class NonSystematicCode(BlockCode):
         self._hamming_distance = min(list(map(lambda x: hamming(x[0], x[1]), word_combos)))
 
     def decode(self, codeword):
-        if len(codeword) != self.n:
-            raise ValueError("length of message is unequal to n")
+        if len(codeword) != self._length:
+            raise ValueError("length {} of message is unequal to n {}".format(len(codeword), self._length))
         return np.dot(codeword, self.parity_check_matrix) % 2
 
 
@@ -165,7 +165,7 @@ class SystematicCode(BlockCode):
 
     def decode(self, codeword):
         if len(codeword) != self._length:
-            raise ValueError("length of message is unequal to n")
+            raise ValueError("length {} of message is unequal to n {}".format(len(codeword), self._length))
         return codeword[self.information_set]
 
 
@@ -188,12 +188,10 @@ class HammingCode(BlockCode):
             extended_parity_sub_matrix = np.hstack([parity_sub_matrix, last_column[np.newaxis].T])
             parity_sub_matrix = extended_parity_sub_matrix
 
-        ####
-
         self._parity_sub_matrix = np.array(parity_sub_matrix, dtype=np.int) % 2
         self._dimension, self._redundancy = self._parity_sub_matrix.shape
         self._length = self._dimension + self._redundancy
-        #
+
         if information_set == 'left':
             information_set = np.arange(self._dimension)
         elif information_set == 'right':
@@ -222,5 +220,5 @@ class HammingCode(BlockCode):
 
     def decode(self, codeword):
         if len(codeword) != self._length:
-            raise ValueError("length of message is unequal to n")
+            raise ValueError("length {} of message is unequal to n {}".format(len(codeword), self._length))
         return codeword[self.information_set]
