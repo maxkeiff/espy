@@ -85,9 +85,6 @@ assert all(message == [0, 1, 0, 0])
 message = hamming_code.decode(np.array([1, 0, 1, 1, 0, 1, 0]))
 assert all(message == [1, 0, 1, 1])
 
-########################################################################################################################
-
-print('###')
 
 # check maximum likelihood decoding
-hamming_code.maximum_likelihood_decode([1, 0, 1, 1, 0, 1, 1])
+assert (hamming_code.maximum_likelihood_decode([1, 0, 1, 1, 0, 1, 1]) == np.array([1, 0, 1, 1, 0, 1, 0])).any
